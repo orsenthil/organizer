@@ -65,18 +65,28 @@ def delete_empty_folders(root: Path, apply_changes: bool) -> dict[str, int]:
         path = Path(dirpath)
         if path == root:
             continue
-        if path.name.startswith("."):
-            summary["skipped"] += 1
-            continue
-        if any(name for name in dirnames if not name.startswith(".")):
-            summary["skipped"] += 1
-            continue
-        if filenames:
-            summary["skipped"] += 1
-            continue
         if not apply_changes:
             summary["skipped"] += 1
             continue
+        try:
+            entries = list(path.iterdir())
+        except OSError:
+            summary["skipped"] += 1
+            continue
+        non_hidden = [entry for entry in entries if not entry.name.startswith(".")]
+        if non_hidden:
+            summary["skipped"] += 1
+            continue
+        hidden_dirs = [entry for entry in entries if entry.name.startswith(".") and entry.is_dir()]
+        if hidden_dirs:
+            summary["skipped"] += 1
+            continue
+        for entry in entries:
+            if entry.name.startswith(".") and entry.is_file():
+                try:
+                    entry.unlink()
+                except OSError:
+                    summary["skipped"] += 1
         try:
             path.rmdir()
             summary["deleted"] += 1

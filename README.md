@@ -35,10 +35,10 @@ Delete duplicates only:
 uv run organizer --delete
 ```
 
-Delete empty folders in current working directory after apply:
+Delete empty folders in current working directory:
 
 ```bash
-uv run organizer --organize --delete-empty
+uv run organizer --delete-empty-folders
 ```
 
 Custom report path and output folder:

@@ -28,8 +28,8 @@ class PlannedFile:
     action: str
 
 
-def choose_year_month(ctime: float, mtime: float, now: datetime | None = None) -> tuple[str, str]:
-    selected = ctime or mtime
+def choose_year_month(btime: float, mtime: float, now: datetime | None = None) -> tuple[str, str]:
+    selected = btime or mtime
     if not selected:
         selected = (now or datetime.now()).timestamp()
     date = datetime.fromtimestamp(selected)
@@ -48,7 +48,7 @@ def build_groups(
         items_sorted = sorted(items, key=lambda info: str(info.path))
         original = items_sorted[0]
         duplicates = items_sorted[1:]
-        year, month = choose_year_month(original.ctime, original.mtime, now=now)
+        year, month = choose_year_month(original.btime, original.mtime, now=now)
         plans.append(
             GroupPlan(
                 md5=md5,

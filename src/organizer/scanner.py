@@ -23,7 +23,7 @@ class FileInfo:
     path: Path
     size: int
     md5: str
-    ctime: float
+    btime: float
     mtime: float
 
 
@@ -61,12 +61,15 @@ def scan_files(root: Path, exclude_dirs: Iterable[str] | None = None) -> list[Fi
             if not path.is_file():
                 continue
             md5 = compute_md5(path)
+            btime = getattr(stat_result, "st_birthtime", 0.0)
+            if not btime:
+                btime = stat_result.st_ctime
             results.append(
                 FileInfo(
                     path=path,
                     size=stat_result.st_size,
                     md5=md5,
-                    ctime=stat_result.st_ctime,
+                    btime=btime,
                     mtime=stat_result.st_mtime,
                 )
             )

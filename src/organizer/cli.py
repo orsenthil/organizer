@@ -75,9 +75,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Delete duplicate files (originals remain in place).",
     )
     parser.add_argument(
-        "--delete-empty",
+        "--delete-empty-folders",
         action="store_true",
-        help="Delete empty folders in the current working directory after apply.",
+        help="Delete empty folders in the current working directory.",
     )
     return parser.parse_args(argv)
 
@@ -87,6 +87,15 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
     output_root = Path(args.output_root).resolve() if args.output_root else root
     report_path = Path(args.report).resolve()
+
+    if args.delete_empty_folders:
+        empty_summary = delete_empty_folders(Path.cwd(), apply_changes=True)
+        print(
+            "Empty folders cleanup. "
+            f"Deleted: {empty_summary['deleted']}, Skipped: {empty_summary['skipped']}."
+        )
+        if not args.organize and not args.delete:
+            return 0
 
     print(f"Scanning files under: {root}")
     files = scan_files(root)
@@ -110,12 +119,6 @@ def main(argv: list[str] | None = None) -> int:
         summary = delete_duplicates(rows, apply_changes=True)
         print(f"Done. Deleted: {summary['deleted']}, Skipped: {summary['skipped']}.")
 
-    if args.delete_empty:
-        empty_summary = delete_empty_folders(Path.cwd(), apply_changes=True)
-        print(
-            "Empty folders cleanup. "
-            f"Deleted: {empty_summary['deleted']}, Skipped: {empty_summary['skipped']}."
-        )
     return 0
 
 
