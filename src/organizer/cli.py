@@ -79,11 +79,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Delete empty folders in the current working directory after apply.",
     )
-    parser.add_argument(
-        "--delete-empty-folders",
-        action="store_true",
-        help="Delete empty folders in the current working directory after apply.",
-    )
     return parser.parse_args(argv)
 
 
@@ -115,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
         summary = delete_duplicates(rows, apply_changes=True)
         print(f"Done. Deleted: {summary['deleted']}, Skipped: {summary['skipped']}.")
 
-    if args.delete_empty or args.delete_empty_folders:
+    if args.delete_empty:
         empty_summary = delete_empty_folders(Path.cwd(), apply_changes=True)
         print(
             "Empty folders cleanup. "
