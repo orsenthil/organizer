@@ -1,0 +1,30 @@
+[project]
+name = "organizer"
+version = "0.1.0"
+description = "Organize duplicate files into Year/Month/Topic folders."
+ readme = "README.md"
+ requires-python = ">=3.10"
+ dependencies = [
+   "PyPDF2>=3.0.0",
+ ]
+ 
+[project.scripts]
+organizer = "organizer.cli:main"
+ 
+ [project.optional-dependencies]
+ test = [
+   "pytest>=7.0.0",
+ ]
+ build = [
+   "pyinstaller>=6.0.0",
+ ]
+ 
+ [tool.pytest.ini_options]
+ testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling>=1.22.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/organizer"]
