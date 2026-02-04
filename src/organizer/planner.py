@@ -24,12 +24,13 @@ class PlannedFile:
     is_original: bool
     year: str
     month: str
+    created_source: str
     target_path: Path
     action: str
 
 
-def choose_year_month(btime: float, mtime: float, now: datetime | None = None) -> tuple[str, str]:
-    selected = btime or mtime
+def choose_year_month(created_time: float, now: datetime | None = None) -> tuple[str, str]:
+    selected = created_time
     if not selected:
         selected = (now or datetime.now()).timestamp()
     date = datetime.fromtimestamp(selected)
@@ -48,7 +49,7 @@ def build_groups(
         items_sorted = sorted(items, key=lambda info: str(info.path))
         original = items_sorted[0]
         duplicates = items_sorted[1:]
-        year, month = choose_year_month(original.btime, original.mtime, now=now)
+        year, month = choose_year_month(original.created_time, now=now)
         plans.append(
             GroupPlan(
                 md5=md5,
@@ -74,6 +75,7 @@ def build_plan_rows(groups: list[GroupPlan], output_root: Path) -> list[PlannedF
                 is_original=True,
                 year=group.year,
                 month=group.month,
+                created_source=group.original.created_source,
                 target_path=target_path,
                 action="keep",
             )
@@ -93,6 +95,7 @@ def build_plan_rows(groups: list[GroupPlan], output_root: Path) -> list[PlannedF
                     is_original=False,
                     year=group.year,
                     month=group.month,
+                    created_source=group.original.created_source,
                     target_path=target_dir / duplicate_name,
                     action="duplicate",
                 )

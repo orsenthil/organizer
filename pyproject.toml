@@ -6,6 +6,7 @@ description = "Organize duplicate files into Year/Month/Topic folders."
  requires-python = ">=3.10"
  dependencies = [
    "PyPDF2>=3.0.0",
+  "Pillow>=10.0.0",
  ]
  
 [project.scripts]

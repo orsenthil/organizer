@@ -5,7 +5,7 @@ Organize synced files into `Year/Month` folders, deduplicate by MD5, and generat
 ### What it does
 - Scans the current folder (recursively), skipping hidden/system folders.
 - Computes MD5 to find duplicates. Keeps the first path and marks the rest for deletion.
-- Derives Year/Month from file ctime (fallback to mtime, then current date).
+- Derives Year/Month from earliest of metadata (EXIF/PDF), birthtime, ctime, mtime.
 - Generates a CSV report. By default, it is a dry run.
 
 ### Install and run (uv)
@@ -66,6 +66,7 @@ The CSV includes:
 - `original_path`: path of the kept file for that hash
 - `is_original`: yes/no
 - `year`, `month`
+- `created_source`: metadata/birthtime/ctime/mtime/unknown
 - `target_path`: destination for the kept file
 - `action`: keep/duplicate
 

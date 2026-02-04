@@ -19,6 +19,7 @@ def _write_csv(report_path: Path, rows: list[PlannedFile]) -> None:
         "is_original",
         "year",
         "month",
+        "created_source",
         "target_path",
         "action",
     ]
@@ -34,6 +35,7 @@ def _write_csv(report_path: Path, rows: list[PlannedFile]) -> None:
                     "is_original": "yes" if row.is_original else "no",
                     "year": row.year,
                     "month": row.month,
+                    "created_source": row.created_source,
                     "target_path": str(row.target_path),
                     "action": row.action,
                 }
