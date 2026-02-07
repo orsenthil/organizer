@@ -22,6 +22,8 @@ class PlannedFile:
     file_path: Path
     original_path: Path
     is_original: bool
+    btime: float
+    mtime: float
     year: str
     month: str
     created_source: str
@@ -73,6 +75,8 @@ def build_plan_rows(groups: list[GroupPlan], output_root: Path) -> list[PlannedF
                 file_path=group.original.path,
                 original_path=group.original.path,
                 is_original=True,
+                btime=group.original.btime,
+                mtime=group.original.mtime,
                 year=group.year,
                 month=group.month,
                 created_source=group.original.created_source,
@@ -93,6 +97,8 @@ def build_plan_rows(groups: list[GroupPlan], output_root: Path) -> list[PlannedF
                     file_path=duplicate.path,
                     original_path=group.original.path,
                     is_original=False,
+                    btime=group.original.btime,
+                    mtime=group.original.mtime,
                     year=group.year,
                     month=group.month,
                     created_source=group.original.created_source,

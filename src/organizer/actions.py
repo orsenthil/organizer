@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 import os
 from pathlib import Path
 import shutil
+import subprocess
 
 from .planner import PlannedFile
 
@@ -20,6 +22,39 @@ def resolve_target_path(target_path: Path) -> Path:
     raise RuntimeError(f"Unable to resolve unique filename for {target_path}")
 
 
+def _format_timestamp(value: float) -> str:
+    return datetime.fromtimestamp(value).strftime("%Y:%m:%d %H:%M:%S")
+
+
+def _preserve_timestamps(target_path: Path, btime: float, mtime: float) -> None:
+    if not target_path.exists():
+        return
+    if btime <= 0 and mtime <= 0:
+        return
+    create_time = _format_timestamp(btime if btime > 0 else mtime)
+    modify_time = _format_timestamp(mtime if mtime > 0 else btime)
+    try:
+        subprocess.run(
+            [
+                "exiftool",
+                "-overwrite_original",
+                f"-FileCreateDate={create_time}",
+                f"-FileModifyDate={modify_time}",
+                str(target_path),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        pass
+    if mtime > 0:
+        try:
+            os.utime(target_path, (mtime, mtime))
+        except OSError:
+            pass
+
+
 def organize_files(rows: list[PlannedFile], apply_changes: bool) -> dict[str, int]:
     summary = {"moved": 0, "skipped": 0}
     to_move = [row for row in rows if row.action in {"keep", "duplicate"}]
@@ -34,6 +69,7 @@ def organize_files(rows: list[PlannedFile], apply_changes: bool) -> dict[str, in
             continue
         os.makedirs(target_path.parent, exist_ok=True)
         shutil.move(str(row.file_path), str(target_path))
+        _preserve_timestamps(target_path, row.btime, row.mtime)
         summary["moved"] += 1
     return summary
 
