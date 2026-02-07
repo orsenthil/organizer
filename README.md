@@ -116,17 +116,6 @@ organizer --report /path/to/report.csv
 uv run --extra test pytest
 ```
 
-### CSV output
-The CSV includes:
-- `md5`: file hash
-- `file_path`: path of the file in the scan
-- `original_path`: path of the kept file for that hash
-- `is_original`: yes/no
-- `year`, `month`
-- `created_source`: exiftool:<tag>/metadata/filename/birthtime/ctime/mtime/unknown
-- `target_path`: destination for the kept file
-- `action`: keep/duplicate
-
 ### Safety
 - Default behavior is a **dry run** (CSV only).
 - Use either `--organize` or `--delete-duplicates` to apply changes.
