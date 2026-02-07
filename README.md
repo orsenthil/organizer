@@ -1,7 +1,7 @@
 ## Organizer
 
-Organizer is a tool for your digital assets. On a given directory, it will scan the files, de-duplicates them by MD5 hash
-and organizes them to into YYYY/MM path, and writes a report the changes. It can clean up the resulting directories after the movement.
+Organizer is a tool for organizing your digital assets. On a given directory, it will scan the files, de-duplicating them by MD5 hash
+and organizing them by YYYY/MM path.
 
 I developed it for de-duplicating and organizing my digital assets in my Google Drive.
 
