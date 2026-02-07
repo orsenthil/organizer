@@ -1,6 +1,17 @@
 ## Organizer
 
-Organize synced files into `Year/Month` folders, deduplicate by MD5, and generate a CSV report before making any changes.
+Organizer is a tool for your digital assets. On a given directory, it will scan the files, deduplicates them by MD5 hash
+and organizes them to into YYYY/MM path, and writes a report the changes. It can clean up the resulting directories after the movement.
+
+I developed it for deduplicating and organizing my digital assets in my Google Drive.
+
+![](./assets/Orgnizing.png)
+
+### What it does
+- Scans the current folder (recursively), skipping hidden/system folders.
+- Computes MD5 to find duplicates. Keeps the first path and marks the rest for deletion.
+- Derives Year/Month from earliest of metadata (ExifTool when available, else EXIF/PDF), filename dates (YYYY or YYYY-MM), birthtime, ctime, mtime.
+- Generates a CSV report. By default, it is a dry run.
 
 ### Architecture
 The tool is a small CLI with a clear pipeline:
@@ -22,18 +33,31 @@ Code layout:
 - [PyInstaller](https://pyinstaller.org/) for single-file binaries
 - [uv](https://docs.astral.sh/uv/) for dependency management
 
-### What it does
-- Scans the current folder (recursively), skipping hidden/system folders.
-- Computes MD5 to find duplicates. Keeps the first path and marks the rest for deletion.
-- Derives Year/Month from earliest of metadata (ExifTool when available, else EXIF/PDF), birthtime, ctime, mtime.
-- Generates a CSV report. By default, it is a dry run.
+### Dependencies
+- [PyPDF2](https://pypi.org/project/PyPDF2/) for PDF metadata fallback
+- [Pillow](https://pypi.org/project/Pillow/) for image EXIF fallback
+- [ExifTool](https://exiftool.org/) (external binary)
+- [PyInstaller](https://pyinstaller.org/) (build extra)
+- [pytest](https://pypi.org/project/pytest/) (test extra)
 
-### Install and run (uv)
-From the project root:
+
+### Build and run
+From the project root, build a single-file binary:
 
 ```bash
-uv sync
-uv run organizer
+make
+```
+
+or
+
+```bash
+uv run --extra build pyinstaller --onefile -n organizer src/organizer/cli.py
+```
+
+Copy `dist/organizer` into your `$PATH` and run it directly:
+
+```bash
+organizer --version
 ```
 
 ExifTool is required (used to read original creation timestamps). Install it first:
@@ -46,50 +70,43 @@ brew install exiftool
 Show version and build time:
 
 ```bash
-uv run organizer --version
+organizer --version
 ```
 Dry run (CSV only, no changes) in the current directory:
 
 ```bash
-uv run organizer
+organizer
 ```
 
 Apply changes (move originals only):
 
 ```bash
-uv run organizer --organize /path/to/folder
+organizer --organize /path/to/folder
 ```
 
 Organize into a separate output folder:
 
 ```bash
-uv run organizer --organize /path/to/folder --output-root /path/to/output
+organizer --organize /path/to/folder --output-root /path/to/output
 ```
 
 Delete duplicates only:
 
 ```bash
-uv run organizer --delete-duplicates /path/to/folder
+organizer --delete-duplicates /path/to/folder
 ```
 
 Delete empty folders in current working directory:
 
 ```bash
-uv run organizer --delete-empty-folders
+organizer --delete-empty-folders
 ```
 
 Custom report path (dry run):
 
 ```bash
-uv run organizer --report /path/to/report.csv
+organizer --report /path/to/report.csv
 ```
-
-### Build a single-file binary (PyInstaller)
-```bash
-uv run --extra build pyinstaller --onefile -n organizer src/organizer/cli.py
-```
-
-The binary will be created in `dist/organizer`.
 
 ### Tests
 ```bash
@@ -103,7 +120,7 @@ The CSV includes:
 - `original_path`: path of the kept file for that hash
 - `is_original`: yes/no
 - `year`, `month`
-- `created_source`: exiftool:<tag>/metadata/birthtime/ctime/mtime/unknown
+- `created_source`: exiftool:<tag>/metadata/filename/birthtime/ctime/mtime/unknown
 - `target_path`: destination for the kept file
 - `action`: keep/duplicate
 

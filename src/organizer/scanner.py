@@ -94,6 +94,20 @@ def _parse_datetime(value: str) -> datetime | None:
         return None
 
 
+def _filename_timestamp(path: Path) -> float:
+    name = path.stem
+    match = re.search(r"(?<!\d)(20\d{2})[-_.](0[1-9]|1[0-2])(?!\d)", name)
+    if match:
+        year = int(match.group(1))
+        month = int(match.group(2))
+        return datetime(year, month, 1).timestamp()
+    match = re.search(r"(?<!\d)(20\d{2})(?!\d)", name)
+    if match:
+        year = int(match.group(1))
+        return datetime(year, 1, 1).timestamp()
+    return 0.0
+
+
 def _metadata_timestamp(path: Path) -> float:
     suffix = path.suffix.lower()
     candidates: list[float] = []
@@ -190,12 +204,14 @@ def _exiftool_timestamp(path: Path) -> tuple[float, str]:
 def _choose_created_time(
     meta_time: float,
     meta_source: str,
+    filename_time: float,
     btime: float,
     ctime: float,
     mtime: float,
 ) -> tuple[float, str]:
     candidates: list[tuple[str, float]] = [
         (meta_source, meta_time),
+        ("filename", filename_time),
         ("birthtime", btime),
         ("ctime", ctime),
         ("mtime", mtime),
@@ -240,9 +256,11 @@ def scan_files(root: Path, exclude_dirs: Iterable[str] | None = None) -> list[Fi
             else:
                 meta_time = _metadata_timestamp(path)
                 meta_source = "metadata" if meta_time else "metadata"
+            filename_time = _filename_timestamp(path)
             created_time, created_source = _choose_created_time(
                 meta_time=meta_time,
                 meta_source=meta_source,
+                filename_time=filename_time,
                 btime=btime,
                 ctime=ctime,
                 mtime=mtime,
