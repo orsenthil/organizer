@@ -1,9 +1,9 @@
 ## Organizer
 
-Organizer is a tool for your digital assets. On a given directory, it will scan the files, deduplicates them by MD5 hash
+Organizer is a tool for your digital assets. On a given directory, it will scan the files, de-duplicates them by MD5 hash
 and organizes them to into YYYY/MM path, and writes a report the changes. It can clean up the resulting directories after the movement.
 
-I developed it for deduplicating and organizing my digital assets in my Google Drive.
+I developed it for de-duplicating and organizing my digital assets in my Google Drive.
 
 ![](./assets/Orgnizing.png)
 
@@ -12,6 +12,14 @@ I developed it for deduplicating and organizing my digital assets in my Google D
 - Computes MD5 to find duplicates. Keeps the first path and marks the rest for deletion.
 - Derives Year/Month from earliest of metadata (ExifTool when available, else EXIF/PDF), filename dates (YYYY or YYYY-MM), birthtime, ctime, mtime.
 - Generates a CSV report. By default, it is a dry run.
+
+**Safety First** - Take a backup before running with `--organize` or `--delete-duplicates`.
+
+ExifTool is required (used to read original creation timestamps). Install it first:
+
+```bash
+brew install exiftool
+```
 
 ### Architecture
 The tool is a small CLI with a clear pipeline:
@@ -60,11 +68,6 @@ Copy `dist/organizer` into your `$PATH` and run it directly:
 organizer --version
 ```
 
-ExifTool is required (used to read original creation timestamps). Install it first:
-
-```bash
-brew install exiftool
-```
 
 ### Common usage
 Show version and build time:
